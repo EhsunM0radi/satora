@@ -185,6 +185,32 @@
                                     <p>@lang('installer::app.installer.index.start.main')</p>
                                 </div>
 
+                                <!-- Business Preset -->
+                                <div :class="[stepStates.businessPreset == 'active' ? 'font-bold' : '']">
+                                    <template v-if="stepStates.businessPreset !== 'complete'">
+                                        <span class="text-xl"
+                                            :class="stepStates.businessPreset === 'pending' ? 'icon-checkbox-normal' : 'icon-right'">
+                                        </span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="icon-tick text-green-500"></span>
+                                    </template>
+                                    <p>@lang('installer::app.installer.index.business-preset.title')</p>
+                                </div>
+
+                                <!-- Design Selection -->
+                                <div :class="[stepStates.designSelection == 'active' ? 'font-bold' : '']">
+                                    <template v-if="stepStates.designSelection !== 'complete'">
+                                        <span class="text-xl"
+                                            :class="stepStates.designSelection === 'pending' ? 'icon-checkbox-normal' : 'icon-right'">
+                                        </span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="icon-tick text-green-500"></span>
+                                    </template>
+                                    <p>@lang('installer::app.installer.index.design-selection.title')</p>
+                                </div>
+
                                 <!-- Server Environment -->
                                 <div :class="[stepStates.systemRequirements == 'active' ? 'font-bold' : '']">
                                     <template v-if="stepStates.systemRequirements !== 'complete'">
@@ -388,6 +414,107 @@
                             </div>
                         </form>
                     </x-installer::form>
+                </div>
+
+                <!-- Business Preset Step -->
+                <div
+                    class="w-full max-w-[568px] rounded-lg border-[1px] border-gray-300 bg-white shadow-[0px_8px_10px_0px_rgba(0,0,0,0.05)]"
+                    v-if="currentStep == 'businessPreset'"
+                >
+                    <div class="border-b border-gray-300 px-4 py-3">
+                        <p class="text-xl font-bold text-gray-800">
+                            @lang('installer::app.installer.index.business-preset.title')
+                        </p>
+                    </div>
+
+                    <div class="flex h-[388px] flex-col gap-3 overflow-y-auto px-7 py-4">
+                        <p class="text-sm text-gray-600">
+                            @lang('installer::app.installer.index.business-preset.description')
+                        </p>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div v-for="preset in availablePresets" :key="preset.code"
+                                 @click="presetCode = preset.code; selectedTheme = preset.recommended_theme; selectedTemplate = preset.recommended_template"
+                                 class="cursor-pointer rounded-lg border p-3 transition hover:border-blue-400 hover:shadow-sm"
+                                 :class="presetCode === preset.code ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200'">
+                                <div class="text-2xl mb-1">@{{ preset.icon || '✨' }}</div>
+                                <div class="text-sm font-semibold text-gray-800">@{{ preset.name }}</div>
+                                <div class="text-xs text-gray-500 mt-1">@{{ preset.description }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <div class="cursor-pointer text-base font-semibold text-blue-600" role="button" @click="back">
+                            @lang('installer::app.installer.index.back')
+                        </div>
+                        <button type="button" class="primary-button" @click="nextForm" :disabled="!presetCode">
+                            @lang('installer::app.installer.index.continue')
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Design Selection Step -->
+                <div
+                    class="w-full max-w-[568px] rounded-lg border-[1px] border-gray-300 bg-white shadow-[0px_8px_10px_0px_rgba(0,0,0,0.05)]"
+                    v-if="currentStep == 'designSelection'"
+                >
+                    <div class="border-b border-gray-300 px-4 py-3">
+                        <p class="text-xl font-bold text-gray-800">
+                            @lang('installer::app.installer.index.design-selection.title')
+                        </p>
+                    </div>
+
+                    <div class="flex h-[388px] flex-col gap-3 overflow-y-auto px-7 py-4">
+                        <p class="text-sm text-gray-600">
+                            @lang('installer::app.installer.index.design-selection.description')
+                        </p>
+
+                        {{-- Theme selector --}}
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-semibold text-gray-700">@lang('installer::app.installer.index.design-selection.themes')</p>
+                            <span class="text-xs text-gray-500">@lang('installer::app.installer.index.design-selection.colors-and-fonts')</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div v-for="theme in availableThemes" :key="theme.code"
+                                 @click="selectedTheme = theme.code"
+                                 class="cursor-pointer rounded-lg border p-2 text-center transition"
+                                 :class="selectedTheme === theme.code ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200'">
+                                <div class="flex justify-center gap-1 mb-1">
+                                    <span v-for="(hex, name) in theme.colors" :key="name"
+                                          class="h-4 w-4 rounded-full border"
+                                          :style="'background:' + hex"
+                                          v-if="name === 'primary' || name === 'accent' || name === 'background'">
+                                    </span>
+                                </div>
+                                <div class="text-xs font-semibold">@{{ theme.name }}</div>
+                            </div>
+                        </div>
+
+                        {{-- Template selector --}}
+                        <div class="flex items-center justify-between mt-2">
+                            <p class="text-sm font-semibold text-gray-700">@lang('installer::app.installer.index.design-selection.templates')</p>
+                            <span class="text-xs text-gray-500">@lang('installer::app.installer.index.design-selection.page-layout')</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div v-for="template in availableTemplates" :key="template.code"
+                                 @click="selectedTemplate = template.code"
+                                 class="cursor-pointer rounded-lg border p-2 transition"
+                                 :class="selectedTemplate === template.code ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-gray-200'">
+                                <div class="text-xs font-semibold">@{{ template.name }}</div>
+                                <div class="text-xs text-gray-500 mt-1">@{{ template.sections ? template.sections.length : 0 }} sections</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between px-4 py-3">
+                        <div class="cursor-pointer text-base font-semibold text-blue-600" role="button" @click="back">
+                            @lang('installer::app.installer.index.back')
+                        </div>
+                        <button type="button" class="primary-button" @click="nextForm" :disabled="!selectedTheme || !selectedTemplate">
+                            @lang('installer::app.installer.index.continue')
+                        </button>
+                    </div>
                 </div>
 
                 <!-- System Requirements -->
@@ -1253,8 +1380,17 @@
                                 allowed: [],
                             },
 
+                            presetCode: null,
+                            selectedTheme: null,
+                            selectedTemplate: null,
+                            availablePresets: [],
+                            availableThemes: [],
+                            availableTemplates: [],
+
                             stepStates: {
                                 start: 'active',
+                                businessPreset: 'pending',
+                                designSelection: 'pending',
                                 systemRequirements: 'pending',
                                 envDatabase: 'pending',
                                 readyForInstallation: 'pending',
@@ -1266,6 +1402,8 @@
 
                             steps: [
                                 'start',
+                                'businessPreset',
+                                'designSelection',
                                 'systemRequirements',
                                 'envDatabase',
                                 'readyForInstallation',
@@ -1292,6 +1430,11 @@
                         };
 
                         window.addEventListener('beforeunload', preventUnload);
+
+                        // Fetch presets, themes, and templates for wizard steps
+                        this.fetchPresets();
+                        this.fetchThemes();
+                        this.fetchTemplates();
                     },
 
                     methods: {
@@ -1330,7 +1473,15 @@
                         nextForm(params) {
                             const stepActions = {
                                 start: () => {
-                                    this.completeStep('start', 'systemRequirements', 'active', 'complete');
+                                    this.completeStep('start', 'businessPreset', 'active', 'complete');
+                                },
+
+                                businessPreset: () => {
+                                    this.completeStep('businessPreset', 'designSelection', 'active', 'complete');
+                                },
+
+                                designSelection: () => {
+                                    this.completeStep('designSelection', 'systemRequirements', 'active', 'complete');
                                 },
 
                                 systemRequirements: () => {
@@ -1492,6 +1643,32 @@
                                         alert('Failed to create admin user.');
                                     }
                                 });
+                        },
+
+                        fetchPresets() {
+                            this.$axios.get(\"{{ url('/install/api/satora/presets') }}?locale=\" + (this.envData.app_locale || 'en'))
+                                .then((response) => {
+                                    this.availablePresets = response.data.data || [];
+                                })
+                                .catch(() => {
+                                    // Silently fail — presets are optional for the UI
+                                });
+                        },
+
+                        fetchThemes() {
+                            this.$axios.get(\"{{ url('/install/api/satora/themes') }}\")
+                                .then((response) => {
+                                    this.availableThemes = response.data.data || [];
+                                })
+                                .catch(() => {});
+                        },
+
+                        fetchTemplates() {
+                            this.$axios.get(\"{{ url('/install/api/satora/templates') }}\")
+                                .then((response) => {
+                                    this.availableTemplates = response.data.data || [];
+                                })
+                                .catch(() => {});
                         },
 
                         pushAllowedCurrency() {

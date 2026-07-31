@@ -980,6 +980,20 @@ return [
             'catalan' => 'Catalan',
             'chinese' => 'Chinese',
             'continue' => 'Continue',
+
+            'business-preset' => [
+                'title' => 'Business Type',
+                'description' => 'What type of store are you creating? Select a preset to get started quickly.',
+            ],
+
+            'design-selection' => [
+                'title' => 'Theme & Template',
+                'description' => 'Choose the visual identity and page layout for your store.',
+                'themes' => 'Theme',
+                'templates' => 'Template',
+                'colors-and-fonts' => 'Colors & Fonts',
+                'page-layout' => 'Page Layout',
+            ],
             'dutch' => 'Dutch',
             'english' => 'English',
             'french' => 'French',
