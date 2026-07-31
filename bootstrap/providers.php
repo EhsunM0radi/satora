@@ -4,6 +4,7 @@ use App\Providers\AppServiceProvider;
 use Webkul\Admin\Providers\AdminServiceProvider;
 use Webkul\Attribute\Providers\AttributeServiceProvider;
 use Webkul\BookingProduct\Providers\BookingProductServiceProvider;
+use Webkul\BusinessPreset\Providers\BusinessPresetServiceProvider;
 use Webkul\CartRule\Providers\CartRuleServiceProvider;
 use Webkul\CatalogRule\Providers\CatalogRuleServiceProvider;
 use Webkul\Category\Providers\CategoryServiceProvider;
@@ -40,20 +41,13 @@ use Webkul\SocialLogin\Providers\SocialLoginServiceProvider;
 use Webkul\SocialShare\Providers\SocialShareServiceProvider;
 use Webkul\Stripe\Providers\StripeServiceProvider;
 use Webkul\Tax\Providers\TaxServiceProvider;
+use Webkul\Tenant\Providers\TenantServiceProvider;
 use Webkul\Theme\Providers\ThemeServiceProvider;
-use Webkul\User\Providers\UserServiceProvider;
 use Webkul\ThemeManager\Providers\ThemeManagerServiceProvider;
-use Webkul\BusinessPreset\Providers\BusinessPresetServiceProvider;
+use Webkul\User\Providers\UserServiceProvider;
 
 return [
-    /**
-     * Application service providers.
-     */
     AppServiceProvider::class,
-
-    /**
-     * Webkul's service providers.
-     */
     AdminServiceProvider::class,
     AttributeServiceProvider::class,
     BookingProductServiceProvider::class,
@@ -97,4 +91,5 @@ return [
     UserServiceProvider::class,
     ThemeManagerServiceProvider::class,
     BusinessPresetServiceProvider::class,
+    TenantServiceProvider::class,
 ];

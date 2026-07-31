@@ -54,7 +54,7 @@
         "bagisto/laravel-datafaker": "2.3.*",
         "barryvdh/laravel-debugbar": "^3.8",
         "fakerphp/faker": "^1.23",
-        "laravel/boost": "^2.1",
+        "laravel/boost": "^2.4",
         "laravel/pint": "^1.19",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
@@ -108,6 +108,7 @@
             "Webkul\\Theme\\": "packages/Webkul/Theme/src",
             "Webkul\\User\\": "packages/Webkul/User/src",
             "Webkul\\ThemeManager\\": "packages/Webkul/ThemeManager/src",
+            "Webkul\\Tenant\\": "packages/Webkul/Tenant/src",
             "Webkul\\BusinessPreset\\": "packages/Webkul/BusinessPreset/src"
         }
     },

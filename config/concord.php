@@ -4,18 +4,7 @@ use Webkul\Admin\Providers\ModuleServiceProvider;
 use Webkul\Core\CoreConvention;
 
 return [
-
-    /**
-     * The path of the convention file.
-     */
     'convention' => CoreConvention::class,
-
-    /**
-     * Example:
-     *
-     * VendorA\ModuleX\Providers\ModuleServiceProvider::class,
-     * VendorB\ModuleY\Providers\ModuleServiceProvider::class,
-     */
     'modules' => [
         ModuleServiceProvider::class,
         Webkul\Attribute\Providers\ModuleServiceProvider::class,
@@ -52,5 +41,6 @@ return [
         Webkul\User\Providers\ModuleServiceProvider::class,
         Webkul\ThemeManager\Providers\ModuleServiceProvider::class,
         Webkul\BusinessPreset\Providers\ModuleServiceProvider::class,
+        Webkul\Tenant\Providers\ModuleServiceProvider::class,
     ],
 ];
