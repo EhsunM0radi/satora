@@ -13,77 +13,56 @@ use Webkul\Theme\Repositories\ThemeCustomizationRepository;
 
 class HomeController extends Controller
 {
-    /**
-     * Using const variable for status
-     */
     const STATUS = 1;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct(protected ThemeCustomizationRepository $themeCustomizationRepository, protected CategoryRepository $categoryRepository) {}
+    public function __construct(
+        protected ThemeCustomizationRepository $themeCustomizationRepository,
+        protected CategoryRepository $categoryRepository
+    ) {}
 
     /**
      * Loads the home page for the storefront.
-     *
-     * @return View
+     * Redirects to installer if no tenant resolved (SaaS central domain).
      */
-    public function index()
+    public function index(): View|RedirectResponse
     {
+        // If no tenant is resolved, this is the central/landing domain — show installer
+        if (! app()->bound('current_tenant') || ! app('current_tenant')) {
+            return redirect()->route('installer.index');
+        }
+
         $customizations = $this->themeCustomizationRepository->orderBy('sort_order')->findWhere([
             'status' => self::STATUS,
             'channel_id' => core()->getCurrentChannel()->id,
             'theme_code' => core()->getCurrentChannel()->theme,
         ]);
 
-        $categories = $this->categoryRepository->getVisibleCategoryTree(core()->getCurrentChannel()->root_category_id);
+        $categories = $this->categoryRepository->getVisibleCategoryTree(
+            core()->getCurrentChannel()->root_category_id
+        );
 
         $categories = CategoryTreeResource::collection($categories);
 
         return view('shop::home.index', compact('customizations', 'categories'));
     }
 
-    /**
-     * Loads the home page for the storefront if something wrong.
-     *
-     * @return \Exception
-     */
     public function notFound()
     {
         abort(404);
     }
 
-    /**
-     * Summary of contact.
-     *
-     * @return View
-     */
-    public function contactUs()
+    public function contactUs(): View
     {
         return view('shop::home.contact-us');
     }
 
-    /**
-     * Summary of store.
-     *
-     * @return RedirectResponse
-     */
-    public function sendContactUsMail(ContactRequest $contactRequest)
+    public function sendContactUsMail(ContactRequest $contactRequest): RedirectResponse
     {
         try {
-            Mail::queue(new ContactUs($contactRequest->only([
-                'name',
-                'email',
-                'contact',
-                'message',
-            ])));
-
+            Mail::queue(new ContactUs($contactRequest->only(['name', 'email', 'contact', 'message'])));
             session()->flash('success', trans('shop::app.home.thanks-for-contact'));
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
-
             report($e);
         }
 

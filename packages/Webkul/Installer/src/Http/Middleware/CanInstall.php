@@ -11,26 +11,17 @@ use Webkul\Installer\Helpers\DatabaseManager;
 class CanInstall
 {
     /**
-     * Handles Requests for Installer middleware.
-     *
-     * @return void
+     * Always allow /install as the SaaS signup wizard.
      */
     public function handle(Request $request, Closure $next)
     {
         if (Str::contains($request->getPathInfo(), '/install')) {
-            if ($this->isAlreadyInstalled()) {
-                if (! $request->ajax()) {
-                    return redirect()->route('shop.home.index');
-                }
+            // Always allow installer routes — they serve as the SaaS signup wizard
+            return $next($request);
+        }
 
-                return response()->json([
-                    'message' => trans('installer::app.installer.middleware.already-installed'),
-                ], 403);
-            }
-        } else {
-            if (! $this->isAlreadyInstalled()) {
-                return redirect()->route('installer.index');
-            }
+        if (! $this->isAlreadyInstalled()) {
+            return redirect()->route('installer.index');
         }
 
         return $next($request);
@@ -38,10 +29,8 @@ class CanInstall
 
     /**
      * Application Already Installed.
-     *
-     * @return bool
      */
-    public function isAlreadyInstalled()
+    public function isAlreadyInstalled(): bool
     {
         if (file_exists(storage_path('installed'))) {
             return true;
@@ -49,7 +38,6 @@ class CanInstall
 
         if (app(DatabaseManager::class)->isInstalled()) {
             touch(storage_path('installed'));
-
             Event::dispatch('bagisto.installed');
 
             return true;

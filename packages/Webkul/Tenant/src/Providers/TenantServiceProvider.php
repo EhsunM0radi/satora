@@ -5,6 +5,7 @@ namespace Webkul\Tenant\Providers;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Webkul\Tenant\Http\Controllers\SignupController;
 use Webkul\Tenant\Http\Controllers\TenantController;
 use Webkul\Tenant\Http\Middleware\ResolveTenant;
 use Webkul\Tenant\Repositories\TenantRepository;
@@ -35,12 +36,18 @@ class TenantServiceProvider extends ServiceProvider
 
     protected function registerRoutes(): void
     {
-        Route::group([
-            'prefix' => 'api/v1',
-            'middleware' => 'api',
-        ], function () {
+        // API: tenant creation
+        Route::group(['prefix' => 'api/v1', 'middleware' => 'api'], function () {
             Route::post('tenant', [TenantController::class, 'store'])
                 ->name('api.tenant.store');
+        });
+
+        // Web: signup form
+        Route::group(['middleware' => 'web'], function () {
+            Route::get('signup', [SignupController::class, 'show'])
+                ->name('signup.show');
+            Route::post('signup', [SignupController::class, 'store'])
+                ->name('signup.store');
         });
     }
 
