@@ -515,6 +515,14 @@
                             @lang('installer::app.installer.index.continue')
                         </button>
                     </div>
+
+                    {{-- Start Free CTA --}}
+                    <div class="border-t border-gray-200 px-4 py-3 text-center">
+                        <a href="{{ url('/signup') }}" class="inline-flex items-center gap-2 rounded-md bg-green-600 px-6 py-2.5 text-base font-bold text-white shadow hover:bg-green-700 transition">
+                            🚀 @lang('installer::app.installer.index.start-free')
+                        </a>
+                        <p class="mt-1 text-xs text-gray-400">@lang('installer::app.installer.index.skip-wizard')</p>
+                    </div>
                 </div>
 
                 <!-- System Requirements -->

@@ -994,6 +994,8 @@ return [
                 'colors-and-fonts' => 'Colors & Fonts',
                 'page-layout' => 'Page Layout',
             ],
+            'start-free' => 'Start Free — Build Your Store',
+            'skip-wizard' => 'Skip wizard and go directly to signup',
             'dutch' => 'Dutch',
             'english' => 'English',
             'french' => 'French',
