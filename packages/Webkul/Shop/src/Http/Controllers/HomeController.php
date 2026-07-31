@@ -21,16 +21,17 @@ class HomeController extends Controller
     ) {}
 
     /**
-     * Loads the home page for the storefront.
-     * Redirects to installer if no tenant resolved (SaaS central domain).
+     * Landing page (SaaS homepage) — shown when no tenant is resolved.
+     * Tenant storefront is shown when a tenant is active.
      */
     public function index(): View|RedirectResponse
     {
-        // If no tenant is resolved, this is the central/landing domain — show installer
+        // If no tenant resolved, show SaaS landing page
         if (! app()->bound('current_tenant') || ! app('current_tenant')) {
-            return redirect()->route('installer.index');
+            return view('shop::home.landing');
         }
 
+        // Tenant resolved — show their storefront
         $customizations = $this->themeCustomizationRepository->orderBy('sort_order')->findWhere([
             'status' => self::STATUS,
             'channel_id' => core()->getCurrentChannel()->id,
@@ -40,7 +41,6 @@ class HomeController extends Controller
         $categories = $this->categoryRepository->getVisibleCategoryTree(
             core()->getCurrentChannel()->root_category_id
         );
-
         $categories = CategoryTreeResource::collection($categories);
 
         return view('shop::home.index', compact('customizations', 'categories'));
