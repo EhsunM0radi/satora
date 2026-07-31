@@ -1,0 +1,6 @@
+[submodule "packages/Webkul/ThemeManager"]
+	path = packages/Webkul/ThemeManager
+	url = https://github.com/EhsunM0radi/satora-theme-manager.git
+[submodule "packages/Webkul/BusinessPreset"]
+	path = packages/Webkul/BusinessPreset
+	url = https://github.com/EhsunM0radi/satora-business-preset.git
