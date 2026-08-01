@@ -29,12 +29,12 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // Pivot: tenant admins (which users manage which tenants)
+        // Pivot: tenant admins (which admins manage which tenants)
         Schema::create('tenant_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
             $table->unsignedInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('admins')->cascadeOnDelete();
             $table->string('role')->default('tenant_admin');
             $table->timestamps();
             $table->unique(['tenant_id', 'user_id']);

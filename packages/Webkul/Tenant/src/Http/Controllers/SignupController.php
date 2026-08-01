@@ -18,17 +18,11 @@ class SignupController extends Controller
         protected TenantRepository $tenantRepository
     ) {}
 
-    /**
-     * Show the signup form (linked from installer CTA).
-     */
     public function show(): View
     {
         return view('tenant::signup');
     }
 
-    /**
-     * Handle signup — create tenant + admin, then redirect to admin.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -54,16 +48,14 @@ class SignupController extends Controller
                 'locale' => $validated['locale'] ?? 'fa',
             ]);
 
-            $admin = Admin::firstOrCreate(
-                ['email' => $validated['admin_email']],
-                [
-                    'name' => $validated['store_name'],
-                    'password' => Hash::make($validated['admin_password']),
-                    'status' => 1,
-                    'role_id' => 1,
-                    'view_permission' => 'global',
-                ]
-            );
+            // Create admin user
+            $admin = Admin::create([
+                'name' => $validated['store_name'],
+                'email' => $validated['admin_email'],
+                'password' => Hash::make($validated['admin_password']),
+                'status' => 1,
+                'role_id' => 1,
+            ]);
 
             $tenant->users()->attach($admin->id, ['role' => 'tenant_admin']);
 
