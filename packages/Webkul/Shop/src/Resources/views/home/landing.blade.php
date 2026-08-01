@@ -102,7 +102,7 @@ img,svg,video{max-width:100%;height:auto}
   <p>ساتورا یک پلتفرم فروشگاهی کامل است. نوع کسب‌وکار خود را انتخاب کنید و فروشگاه حرفه‌ای خود را تحویل بگیرید. بدون کدنویسی، بدون دردسر.</p>
   <div class="hero-btns">
     <a href="{{ url('/signup') }}" class="btn-primary">🚀 شروع رایگان</a>
-    <a href="{{ url('/install') }}" class="btn-outline">🎮 مشاهده نسخه نمایشی</a>
+    <a href="{{ url('/signup') }}" class="btn-outline">🎮 مشاهده نسخه نمایشی</a>
   </div>
 </section>
 
