@@ -4,6 +4,7 @@ namespace Webkul\Tenant\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
@@ -39,16 +40,17 @@ class SignupController extends Controller
         DB::beginTransaction();
 
         try {
+            $locale = $validated['locale'] ?? 'fa';
+
             $tenant = $this->tenantRepository->create([
                 'name' => $validated['store_name'],
                 'slug' => $validated['slug'],
                 'business_type' => $validated['business_type'] ?? null,
                 'theme' => $validated['theme'] ?? 'minimal-luxury',
                 'template' => $validated['template'] ?? 'fashion',
-                'locale' => $validated['locale'] ?? 'fa',
+                'locale' => $locale,
             ]);
 
-            // Create admin user
             $admin = Admin::create([
                 'name' => $validated['store_name'],
                 'email' => $validated['admin_email'],
@@ -78,8 +80,18 @@ class SignupController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.session.create')
+            // Set locale for the admin panel session
+            app()->setLocale($locale);
+            session()->put('locale', $locale);
+            session()->put('admin_locale', $locale);
+
+            // Auto-login the new admin
+            Auth::guard('admin')->login($admin);
+
+            // Redirect to admin dashboard — now in Persian RTL
+            return redirect()->route('admin.dashboard.index')
                 ->with('success', __('tenant::app.store_created'));
+
         } catch (\Exception $e) {
             DB::rollBack();
 
