@@ -176,5 +176,15 @@
         <script type="text/javascript">
             {!! core()->getConfigData('general.content.custom_scripts.custom_javascript') !!}
         </script>
+
+
+        @auth('admin')
+        <div style="position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1e293b;color:white;padding:.6rem 1rem;display:flex;justify-content:center;gap:1.5rem;font-family:'Vazirmatn',sans-serif;font-size:.85rem;box-shadow:0 -4px 20px rgba(0,0,0,.2)">
+            <span style="opacity:.7">👋 {{ auth('admin')->user()->name }}</span>
+            <a href="/" style="color:#22c55e;text-decoration:none;font-weight:600">🛍️ فروشگاه</a>
+            <a href="/admin" style="color:#6366f1;text-decoration:none;font-weight:600">⚙️ پنل مدیریت</a>
+        </div>
+        @endauth
+
     </body>
 </html>

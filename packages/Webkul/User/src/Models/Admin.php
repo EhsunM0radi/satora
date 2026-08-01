@@ -101,6 +101,19 @@ class Admin extends Authenticatable implements AdminContract
     }
 
     /**
+     * Get the tenants the admin manages.
+     */
+    public function tenants()
+    {
+        return $this->belongsToMany(
+            \Webkul\Tenant\Models\Tenant::class,
+            'tenant_user',
+            'user_id',
+            'tenant_id'
+        )->withPivot('role')->withTimestamps();
+    }
+
+    /**
      * Checks if admin has permission to perform certain action.
      *
      * @param  string  $permission

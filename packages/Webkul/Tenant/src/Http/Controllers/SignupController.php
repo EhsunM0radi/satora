@@ -89,7 +89,7 @@ class SignupController extends Controller
             Auth::guard('admin')->login($admin);
 
             // Redirect to admin dashboard — now in Persian RTL
-            return redirect()->route('admin.dashboard.index')
+            return redirect()->route('onboarding.show')
                 ->with('success', __('tenant::app.store_created'));
 
         } catch (\Exception $e) {

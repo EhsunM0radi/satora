@@ -3,12 +3,9 @@
 namespace Webkul\Tenant\Providers;
 
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Webkul\Tenant\Http\Controllers\SignupController;
-use Webkul\Tenant\Http\Controllers\TenantController;
+use Illuminate\Support\Facades\Route;
 use Webkul\Tenant\Http\Middleware\ResolveTenant;
-use Webkul\Tenant\Repositories\TenantRepository;
 use Webkul\Tenant\TenantResolver;
 
 class TenantServiceProvider extends ServiceProvider
@@ -20,7 +17,7 @@ class TenantServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(TenantResolver::class, function ($app) {
-            return new TenantResolver($app->make(TenantRepository::class));
+            return new TenantResolver($app->make(\Webkul\Tenant\Repositories\TenantRepository::class));
         });
     }
 
@@ -36,18 +33,27 @@ class TenantServiceProvider extends ServiceProvider
 
     protected function registerRoutes(): void
     {
-        // API: tenant creation
+        // API
         Route::group(['prefix' => 'api/v1', 'middleware' => 'api'], function () {
-            Route::post('tenant', [TenantController::class, 'store'])
+            Route::post('tenant', [\Webkul\Tenant\Http\Controllers\TenantController::class, 'store'])
                 ->name('api.tenant.store');
         });
 
-        // Web: signup form
+        // Web
         Route::group(['middleware' => 'web'], function () {
-            Route::get('signup', [SignupController::class, 'show'])
+            // Signup
+            Route::get('signup', [\Webkul\Tenant\Http\Controllers\SignupController::class, 'show'])
                 ->name('signup.show');
-            Route::post('signup', [SignupController::class, 'store'])
+            Route::post('signup', [\Webkul\Tenant\Http\Controllers\SignupController::class, 'store'])
                 ->name('signup.store');
+
+            // Onboarding wizard (requires admin auth)
+            Route::middleware('admin')->group(function () {
+                Route::get('onboarding/{step?}', [\Webkul\Tenant\Http\Controllers\OnboardingController::class, 'show'])
+                    ->name('onboarding.show');
+                Route::post('onboarding', [\Webkul\Tenant\Http\Controllers\OnboardingController::class, 'store'])
+                    ->name('onboarding.store');
+            });
         });
     }
 
