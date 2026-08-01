@@ -137,7 +137,7 @@
             id="app"
             class="container-fluide fixed w-full"
         >
-            <div class="flex [&amp;>*]:w-[50%] gap-12 justify-center items-center">
+            <div class="flex flex-col lg:flex-row [&>*]:w-full lg:[&>*]:w-[50%] gap-6 lg:gap-12 justify-center items-center lg:items-start px-4 lg:px-0">
                 <!-- Vue Component -->
                 <v-server-requirements></v-server-requirements>
             </div>
@@ -149,7 +149,7 @@
                 id="v-server-requirements-template"
             >
                 <!-- Left Side Welcome to Installation -->
-                <div class="flex flex-col justify-center">
+                <div class="flex flex-col justify-center text-center lg:text-right items-center lg:items-start">
                     <div class="m-auto grid h-[100vh] max-w-[362px] items-end">
                         <div class="grid gap-4">
                             <img
@@ -1389,8 +1389,8 @@
                             },
 
                             presetCode: null,
-                            selectedTheme: null,
-                            selectedTemplate: null,
+                            selectedTheme: 'minimal-luxury',
+                            selectedTemplate: 'fashion',
                             availablePresets: [],
                             availableThemes: [],
                             availableTemplates: [],
