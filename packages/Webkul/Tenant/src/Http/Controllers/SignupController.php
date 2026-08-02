@@ -122,11 +122,8 @@ class SignupController extends Controller
             return redirect()->route('signup.show');
         }
 
-        // TODO: Verify OTP against SMS provider
-        // For now, accept any OTP in local/dev
-        if (! app()->environment('production') || $request->input('otp') === '111111') {
-            // Placeholder — real OTP verification would go here
-        } else {
+        // Test OTP: always accept 111111; real SMS verification TBD
+        if ($request->input('otp') !== '111111') {
             return back()->withErrors(['otp' => __('tenant::signup.invalid_otp')]);
         }
 
