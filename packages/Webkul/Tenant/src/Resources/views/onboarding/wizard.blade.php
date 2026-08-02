@@ -105,7 +105,7 @@ body{font-family:'Vazirmatn',sans-serif;background:#f1f5f9;color:#1e293b;min-hei
             <input type="text" name="store_name" value="{{ $tenant->name }}" placeholder="{{ __('tenant::onboarding.wizard.store_name_placeholder') }}" required>
         </div>
         <div class="form-row">
-            <input type="text" name="slug" value="{{ $tenant->slug }}" placeholder="your-store-name" required pattern="[a-z0-9-]+" style="direction:ltr;text-align:left">
+            <input type="text" name="slug" value="{{ $tenant->slug }}" placeholder="your-store-name" required pattern="[a-z0-9-]+" style="direction:ltr;text-align:left" autocomplete="off">
         </div>
         <div style="font-size:.75rem;color:#94a3b8;text-align:right;margin-bottom:1rem">فقط حروف انگلیسی، عدد و خط تیره — آدرس فروشگاه شما</div>
         <div class="form-row">

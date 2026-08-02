@@ -168,12 +168,15 @@ class SignupController extends Controller
 
     /**
      * Generate a unique slug from an email or phone string.
+     * For emails, uses the local part. For phone numbers, generates a random slug.
      */
     protected function generateUniqueSlug(string $input): string
     {
-        // Extract the local part of email or use the whole string
-        $base = strstr($input, '@', true) ?: $input;
-        $base = Str::slug(preg_replace('/[^a-zA-Z0-9]/', '', $base) ?: 'store');
+        // Extract the local part of email, or fall back to random for phone numbers
+        $local = strstr($input, '@', true);
+        $base = $local
+            ? Str::slug(preg_replace('/[^a-zA-Z0-9]/', '', $local) ?: 'store')
+            : 'store-'.Str::lower(Str::random(6));
 
         $slug = $base;
         $counter = 1;
