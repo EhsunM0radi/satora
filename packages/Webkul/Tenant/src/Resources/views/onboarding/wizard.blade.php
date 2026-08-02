@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>راه‌اندازی فروشگاه — ساتورا</title>
+<title>{{ __('tenant::onboarding.wizard.title') }}</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -24,7 +24,6 @@ body{font-family:'Vazirmatn',sans-serif;background:#f1f5f9;color:#1e293b;min-hei
 .form-row input:focus,.form-row textarea:focus{outline:none;border-color:#6366f1;background:white}
 .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
 .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem}
-.grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem}
 .choice-card{padding:1.25rem;border:2px solid #e2e8f0;border-radius:14px;cursor:pointer;transition:all .2s;text-align:center}
 .choice-card:hover{border-color:#6366f1;background:#eef2ff}
 .choice-card.selected{border-color:#6366f1;background:#eef2ff;box-shadow:0 0 0 3px rgba(99,102,241,.15)}
@@ -33,22 +32,25 @@ body{font-family:'Vazirmatn',sans-serif;background:#f1f5f9;color:#1e293b;min-hei
 .choice-card .desc{font-size:.78rem;color:#64748b;line-height:1.4}
 .choice-card .meta{font-size:.72rem;color:#94a3b8;margin-top:.3rem}
 .hidden{display:none}
+.btn-row{display:flex;gap:1rem;justify-content:center;margin-top:1.5rem}
 .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2.5rem;border-radius:12px;font-family:'Vazirmatn',sans-serif;font-size:1rem;font-weight:700;border:none;cursor:pointer;transition:all .3s;text-decoration:none}
 .btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);color:white}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(99,102,241,.3)}
+.btn-back{background:white;color:#64748b;border:2px solid #e2e8f0}
+.btn-back:hover{background:#f1f5f9}
 .btn-success{background:linear-gradient(135deg,#22c55e,#16a34a);color:white;font-size:1.1rem;padding:1rem 3rem}
-.btn-back{background:white;color:#64748b;border:2px solid #e2e8f0;margin-right:auto}
 .type-card{padding:2rem;text-align:center;font-size:3rem}
 .type-card .name{font-size:1.2rem;margin-top:.5rem}
 .color-dots{display:flex;gap:4px;justify-content:center;margin-bottom:.4rem}
 .color-dots span{width:16px;height:16px;border-radius:50%;border:1px solid #ddd}
 @media(max-width:600px){
   .card{padding:1.5rem 1rem}
-  .grid-2,.grid-3,.grid-4{grid-template-columns:repeat(2,1fr)}
+  .grid-2,.grid-3{grid-template-columns:repeat(2,1fr)}
   .step-dot{width:28px;height:28px;font-size:.65rem}
   .step-line{width:16px}
   .form-row{flex-direction:column}
   .type-card{font-size:2.5rem}
+  .btn{padding:.75rem 1.5rem;font-size:.9rem}
 }
 </style>
 </head>
@@ -63,10 +65,10 @@ body{font-family:'Vazirmatn',sans-serif;background:#f1f5f9;color:#1e293b;min-hei
     @endforeach
 </div>
 
-{{-- STEP 1: Store or Marketplace --}}
+{{-- STEP 1: Type --}}
 <div class="card {{ $currentStep !== 'type' ? 'hidden' : '' }}">
-    <h2>🏪 نوع پلتفرم خود را انتخاب کنید</h2>
-    <p class="sub">فروشگاه تکی یا مارکت‌پلیس چند فروشنده؟</p>
+    <h2>{{ __('tenant::onboarding.wizard.platform_title') }}</h2>
+    <p class="sub">{{ __('tenant::onboarding.wizard.platform_desc') }}</p>
     <form method="POST" action="{{ route('onboarding.store') }}">
         @csrf
         <input type="hidden" name="step" value="type">
@@ -75,100 +77,120 @@ body{font-family:'Vazirmatn',sans-serif;background:#f1f5f9;color:#1e293b;min-hei
             <label class="choice-card type-card {{ ($tenant->modules['type'] ?? 'store') === 'store' ? 'selected' : '' }}">
                 <input type="radio" name="store_type" value="store" {{ ($tenant->modules['type'] ?? 'store') === 'store' ? 'checked' : '' }} style="display:none">
                 <div class="icon">🛍️</div>
-                <div class="name">فروشگاه</div>
-                <div class="desc">یک فروشگاه اختصاصی برای کسب‌وکار شما</div>
+                <div class="name">{{ __('tenant::onboarding.wizard.store') }}</div>
+                <div class="desc">{{ __('tenant::onboarding.wizard.store_desc') }}</div>
             </label>
             <label class="choice-card type-card {{ ($tenant->modules['type'] ?? '') === 'marketplace' ? 'selected' : '' }}">
                 <input type="radio" name="store_type" value="marketplace" {{ ($tenant->modules['type'] ?? '') === 'marketplace' ? 'checked' : '' }} style="display:none">
                 <div class="icon">🏪</div>
-                <div class="name">مارکت‌پلیس</div>
-                <div class="desc">پلتفرم چند فروشنده — فروشندگان فروشگاه خود را می‌سازند</div>
+                <div class="name">{{ __('tenant::onboarding.wizard.marketplace') }}</div>
+                <div class="desc">{{ __('tenant::onboarding.wizard.marketplace_desc') }}</div>
             </label>
         </div>
-        <button type="submit" class="btn btn-primary" style="margin-top:1.5rem">بعدی — اطلاعات کسب‌وکار ←</button>
+        <div class="btn-row">
+            <button type="submit" class="btn btn-primary">{{ __('tenant::onboarding.wizard.next_prefix') }}{{ $stepLabels[1] }} ←</button>
+        </div>
     </form>
 </div>
 
-{{-- STEP 2: Business Info --}}
+{{-- STEP 2: Info --}}
 <div class="card {{ $currentStep !== 'business-info' ? 'hidden' : '' }}">
-    <h2>📋 اطلاعات کسب‌وکار</h2>
-    <p class="sub">چند جزئیات دیگر درباره فروشگاه خود وارد کنید</p>
+    <h2>{{ __('tenant::onboarding.wizard.info_title') }}</h2>
+    <p class="sub">{{ __('tenant::onboarding.wizard.info_desc') }}</p>
     <form method="POST" action="{{ route('onboarding.store') }}">
         @csrf
         <input type="hidden" name="step" value="business-info">
         <input type="hidden" name="next" value="preset">
         <div class="form-row">
-            <input type="text" name="mobile" value="{{ $tenant->mobile }}" placeholder="📱 شماره تماس" dir="ltr">
+            <input type="text" name="store_name" value="{{ $tenant->name }}" placeholder="{{ __('tenant::onboarding.wizard.store_name_placeholder') }}" required>
         </div>
         <div class="form-row">
-            <textarea name="address" placeholder="📍 آدرس فروشگاه">{{ $tenant->address }}</textarea>
+            <input type="text" name="slug" value="{{ $tenant->slug }}" placeholder="your-store-name" required pattern="[a-z0-9-]+" style="direction:ltr;text-align:left">
         </div>
-        <button type="submit" class="btn btn-primary">بعدی — انتخاب نیش ←</button>
+        <div style="font-size:.75rem;color:#94a3b8;text-align:right;margin-bottom:1rem">فقط حروف انگلیسی، عدد و خط تیره — آدرس فروشگاه شما</div>
+        <div class="form-row">
+            <input type="text" name="mobile" value="{{ $tenant->mobile }}" placeholder="{{ __('tenant::onboarding.wizard.mobile_placeholder') }}" dir="ltr">
+        </div>
+        <div class="form-row">
+            <textarea name="address" placeholder="{{ __('tenant::onboarding.wizard.address_placeholder') }}">{{ $tenant->address }}</textarea>
+        </div>
+        <div class="btn-row">
+            <a href="{{ route('onboarding.show', ['step' => 'type']) }}" class="btn btn-back">{{ __('tenant::onboarding.wizard.back') }}</a>
+            <button type="submit" class="btn btn-primary">{{ __('tenant::onboarding.wizard.next_prefix') }}{{ $stepLabels[2] }} ←</button>
+        </div>
     </form>
 </div>
 
-{{-- STEP 3: Niche/Preset --}}
+{{-- STEP 3: Niche --}}
 <div class="card {{ $currentStep !== 'preset' ? 'hidden' : '' }}">
-    <h2>🎯 نیش (Niche) کسب‌وکار خود را انتخاب کنید</h2>
-    <p class="sub">ما بر اساس نیش شما، قالب‌ها، دسته‌بندی‌ها و تنظیمات را آماده می‌کنیم</p>
+    <h2>{{ __('tenant::onboarding.wizard.niche_title') }}</h2>
+    <p class="sub">{{ __('tenant::onboarding.wizard.niche_desc') }}</p>
     <form method="POST" action="{{ route('onboarding.store') }}">
         @csrf
         <input type="hidden" name="step" value="preset">
         <input type="hidden" name="next" value="template">
         <div class="grid-3">
             @foreach($presets as $preset)
-            @php $icons = ['fashion'=>'👗','electronics'=>'📱','grocery'=>'🛒','beauty'=>'💄','digital'=>'💻','furniture'=>'🪑','marketplace'=>'🏪','custom'=>'✨']; @endphp
             <label class="choice-card {{ $tenant->business_type === $preset->getCode() ? 'selected' : '' }}">
                 <input type="radio" name="preset_code" value="{{ $preset->getCode() }}" {{ $tenant->business_type === $preset->getCode() ? 'checked' : '' }} style="display:none">
                 <div class="icon">{{ $icons[$preset->getCode()] ?? '📦' }}</div>
-                <div class="name">{{ $preset->getName() }}</div>
-                <div class="desc">{{ Str::limit($preset->getDescription(), 50) }}</div>
+                <div class="name">{{ __('tenant::onboarding.presets.' . $preset->getCode() . '.name') }}</div>
+                <div class="desc">{{ __('tenant::onboarding.presets.' . $preset->getCode() . '.desc') }}</div>
             </label>
             @endforeach
         </div>
-        <button type="submit" class="btn btn-primary" style="margin-top:1.5rem">بعدی — انتخاب قالب ←</button>
+        <div class="btn-row">
+            <a href="{{ route('onboarding.show', ['step' => 'business-info']) }}" class="btn btn-back">{{ __('tenant::onboarding.wizard.back') }}</a>
+            <button type="submit" class="btn btn-primary">{{ __('tenant::onboarding.wizard.next_prefix') }}{{ $stepLabels[3] }} ←</button>
+        </div>
     </form>
 </div>
 
-{{-- STEP 4: Templates --}}
+{{-- STEP 4: Template --}}
 <div class="card {{ $currentStep !== 'template' ? 'hidden' : '' }}">
-    <h2>📐 قالب فروشگاه</h2>
-    <p class="sub">ساختار و چیدمان صفحات — {{ count($compatibleTemplates ?? []) }} قالب سازگار با نیش شما</p>
+    <h2>{{ __('tenant::onboarding.wizard.template_title') }}</h2>
+    <p class="sub">{{ __('tenant::onboarding.wizard.template_desc_prefix') }}{{ count($compatibleTemplates ?? []) }}{{ __('tenant::onboarding.wizard.template_desc_suffix') }}</p>
     <form method="POST" action="{{ route('onboarding.store') }}">
         @csrf
         <input type="hidden" name="step" value="template">
         <input type="hidden" name="next" value="theme">
         <div class="grid-2">
             @forelse($compatibleTemplates ?? [] as $tpl)
-            @php $meta = $templateMeta[$tpl] ?? ['name'=>$tpl, 'desc'=>'', 'sections'=>4]; @endphp
+            @php
+                $meta = __("tenant::onboarding.templates.{$tpl}");
+                $sections = [8,7,6,5,4,7,6,7,6,8][array_search($tpl, array_keys($templateMeta ?? []))] ?? 5;
+            @endphp
             <label class="choice-card {{ $tenant->template === $tpl ? 'selected' : '' }}">
                 <input type="radio" name="template" value="{{ $tpl }}" {{ $tenant->template === $tpl ? 'checked' : '' }} style="display:none">
                 <div class="icon">📐</div>
-                <div class="name">{{ $meta['name'] }}</div>
-                <div class="desc">{{ $meta['desc'] }}</div>
-                <div class="meta">{{ $meta['sections'] }} بخش — پیش‌نمایش ساختار صفحه</div>
+                <div class="name">{{ $meta['name'] ?? $tpl }}</div>
+                <div class="desc">{{ $meta['desc'] ?? '' }}</div>
+                <div class="meta">{{ trans_choice('tenant::onboarding.wizard.sections_count', $sections, ['count' => $sections]) }}</div>
             </label>
             @empty
-            <p>قالبی برای این نیش یافت نشد.</p>
+            <p>{{ __('tenant::onboarding.wizard.template_empty') }}</p>
             @endforelse
         </div>
-        <button type="submit" class="btn btn-primary" style="margin-top:1.5rem">بعدی — انتخاب تم ←</button>
+        <div class="btn-row">
+            <a href="{{ route('onboarding.show', ['step' => 'preset']) }}" class="btn btn-back">{{ __('tenant::onboarding.wizard.back') }}</a>
+            <button type="submit" class="btn btn-primary">{{ __('tenant::onboarding.wizard.next_prefix') }}{{ $stepLabels[4] }} ←</button>
+        </div>
     </form>
 </div>
 
 {{-- STEP 5: Theme --}}
 <div class="card {{ $currentStep !== 'theme' ? 'hidden' : '' }}">
-    <h2>🎨 تم فروشگاه</h2>
-    <p class="sub">رنگ‌ها، فونت و هویت بصری</p>
+    <h2>{{ __('tenant::onboarding.wizard.theme_title') }}</h2>
+    <p class="sub">{{ __('tenant::onboarding.wizard.theme_desc') }}</p>
     <form method="POST" action="{{ route('onboarding.store') }}">
         @csrf
         <input type="hidden" name="step" value="theme">
         <input type="hidden" name="next" value="complete">
         <div class="grid-3">
             @foreach([
-                'minimal-luxury' => ['name'=>'مینیمال لوکس', 'colors'=>'#6366f1,#06b6d4,#f8fafc', 'desc'=>'ساده، شیک، حرفه‌ای'],
-                'modern-dark' => ['name'=>'مدرن دارک', 'colors'=>'#0f172a,#6366f1,#1e293b', 'desc'=>'تیره، مدرن، تکنولوژی'],
-                'colorful' => ['name'=>'رنگارنگ', 'colors'=>'#f59e0b,#ef4444,#fef3c7', 'desc'=>'شاد، پرانرژی، دوستانه'],
+                'minimal-luxury' => ['name' => __('tenant::onboarding.themes.minimal-luxury'), 'colors'=>'#6366f1,#06b6d4,#f8fafc', 'desc' => __('tenant::onboarding.themes.minimal-desc')],
+                'modern-dark' => ['name' => __('tenant::onboarding.themes.modern-dark'), 'colors'=>'#0f172a,#6366f1,#1e293b', 'desc' => __('tenant::onboarding.themes.dark-desc')],
+                'colorful' => ['name' => __('tenant::onboarding.themes.colorful'), 'colors'=>'#f59e0b,#ef4444,#fef3c7', 'desc' => __('tenant::onboarding.themes.colorful-desc')],
             ] as $code => $t)
             <label class="choice-card {{ $tenant->theme === $code ? 'selected' : '' }}">
                 <input type="radio" name="theme" value="{{ $code }}" {{ $tenant->theme === $code ? 'checked' : '' }} style="display:none">
@@ -182,18 +204,21 @@ body{font-family:'Vazirmatn',sans-serif;background:#f1f5f9;color:#1e293b;min-hei
             </label>
             @endforeach
         </div>
-        <button type="submit" class="btn btn-primary" style="margin-top:1.5rem">🎉 تکمیل راه‌اندازی ←</button>
+        <div class="btn-row">
+            <a href="{{ route('onboarding.show', ['step' => 'template']) }}" class="btn btn-back">{{ __('tenant::onboarding.wizard.back') }}</a>
+            <button type="submit" class="btn btn-primary">{{ __('tenant::onboarding.wizard.complete') }} ←</button>
+        </div>
     </form>
 </div>
 
 {{-- STEP 6: Done --}}
 <div class="card {{ $currentStep !== 'complete' ? 'hidden' : '' }}">
     <div style="font-size:5rem;margin-bottom:1rem">🎉</div>
-    <h2>فروشگاه شما آماده است!</h2>
-    <p class="sub">همه چیز تنظیم شد — حالا می‌توانید فروشگاه خود را ببینید و مدیریت کنید</p>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem">
-        <a href="/" class="btn btn-success">🛍️ مشاهده فروشگاه</a>
-        <a href="/admin" class="btn btn-primary">⚙️ پنل مدیریت</a>
+    <h2>{{ __('tenant::onboarding.wizard.done_title') }}</h2>
+    <p class="sub">{{ __('tenant::onboarding.wizard.done_desc') }}</p>
+    <div class="btn-row">
+        <a href="{{ $tenantUrl }}/admin" class="btn btn-primary">{{ __('tenant::onboarding.wizard.admin_panel') }}</a>
+        <a href="{{ $tenantUrl }}" class="btn btn-success">{{ __('tenant::onboarding.wizard.view_store') }}</a>
     </div>
 </div>
 

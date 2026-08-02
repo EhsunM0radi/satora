@@ -14,7 +14,9 @@ class ResolveTenant
         $tenant = $resolver->resolve($request);
 
         if (! $tenant) {
-            // No tenant resolved — let the request through for central/install routes
+            // No tenant resolved from domain/path — try admin's tenant for locale
+            $this->applyAdminTenantLocale();
+
             return $next($request);
         }
 
@@ -27,5 +29,23 @@ class ResolveTenant
         }
 
         return $next($request);
+    }
+
+    /**
+     * When on the central domain (no tenant resolved), apply the
+     * authenticated admin's tenant locale if available.
+     */
+    protected function applyAdminTenantLocale(): void
+    {
+        if (! auth()->guard('admin')->check()) {
+            return;
+        }
+
+        $admin = auth()->guard('admin')->user();
+        $tenant = $admin->tenants()->first();
+
+        if ($tenant && $tenant->getLocale()) {
+            app()->setLocale($tenant->getLocale());
+        }
     }
 }

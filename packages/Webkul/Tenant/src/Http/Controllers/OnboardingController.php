@@ -5,6 +5,7 @@ namespace Webkul\Tenant\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Webkul\BusinessPreset\Helpers\PresetApplier;
 use Webkul\BusinessPreset\Helpers\PresetRegistry;
 use Webkul\Tenant\Repositories\TenantRepository;
 
@@ -22,7 +23,7 @@ class OnboardingController extends Controller
         'beauty' => ['beauty', 'fashion', 'minimal'],
         'digital' => ['electronics', 'tech', 'general'],
         'furniture' => ['furniture', 'general', 'minimal'],
-        'marketplace' => ['marketplace', 'general', 'fashion'],
+        'diverse' => ['general', 'minimal', 'fashion'],
         'custom' => ['general', 'minimal', 'fashion'],
     ];
 
@@ -56,10 +57,12 @@ class OnboardingController extends Controller
 
         $data = [
             'tenant' => $tenant,
+            'tenantUrl' => $this->buildTenantUrl($tenant),
             'currentStep' => $currentStep,
             'stepIndex' => $stepIndex,
             'steps' => $this->steps,
             'presets' => $this->presetRegistry->all(),
+            'icons' => ['fashion' => '👗', 'electronics' => '📱', 'grocery' => '🛒', 'beauty' => '💄', 'digital' => '💻', 'furniture' => '🪑', 'diverse' => '🌟', 'custom' => '✨'],
             'stepLabels' => ['نوع', 'اطلاعات', 'نیش', 'قالب', 'تم', 'پایان'],
         ];
 
@@ -89,7 +92,20 @@ class OnboardingController extends Controller
                 break;
 
             case 'business-info':
-                $tenant->update($request->only(['mobile', 'address']));
+                $tenant->update($request->only(['store_name', 'slug', 'mobile', 'address']));
+                // Map store_name to tenant name
+                if ($request->filled('store_name')) {
+                    $tenant->name = $request->input('store_name');
+                    $tenant->save();
+                }
+                // Update admin user name to match store name
+                if ($request->filled('store_name')) {
+                    $admin = Auth::guard('admin')->user();
+                    if ($admin && $admin->name === $tenant->getOriginal('name')) {
+                        $admin->name = $request->input('store_name');
+                        $admin->save();
+                    }
+                }
                 break;
 
             case 'preset':
@@ -110,7 +126,8 @@ class OnboardingController extends Controller
 
             case 'complete':
                 $this->applyPreset($tenant, $tenant->business_type);
-                return redirect('/');
+
+                return redirect()->away($this->buildTenantUrl($tenant));
         }
 
         return redirect()->route('onboarding.show', ['step' => $next]);
@@ -119,17 +136,20 @@ class OnboardingController extends Controller
     protected function getCurrentTenant()
     {
         $admin = Auth::guard('admin')->user();
+
         return $admin ? $admin->tenants()->first() : null;
     }
 
     protected function applyPreset($tenant, ?string $presetCode): void
     {
-        if (! $presetCode) return;
+        if (! $presetCode) {
+            return;
+        }
 
         try {
             $preset = $this->presetRegistry->get($presetCode);
             if ($preset) {
-                app(\Webkul\BusinessPreset\Helpers\PresetApplier::class)->apply($preset);
+                app(PresetApplier::class)->apply($preset);
                 $tenant->theme = $tenant->theme ?: $preset->getRecommendedTheme();
                 $tenant->template = $tenant->template ?: $preset->getRecommendedTemplate();
                 $tenant->save();
@@ -137,5 +157,25 @@ class OnboardingController extends Controller
         } catch (\Exception $e) {
             report($e);
         }
+    }
+
+    /**
+     * Build the tenant's storefront URL.
+     * Local:   http://satora.test/shop/{slug}
+     * Prod:    http://{slug}.satora.test
+     */
+    protected function buildTenantUrl($tenant): string
+    {
+        $appUrl = config('app.url', 'http://satora.test');
+        $parsed = parse_url($appUrl);
+        $host = $parsed['host'] ?? 'satora.test';
+        $scheme = $parsed['scheme'] ?? 'http';
+        $port = isset($parsed['port']) ? ':'.$parsed['port'] : '';
+
+        if (app()->environment('local')) {
+            return sprintf('%s://%s%s/shop/%s', $scheme, $host, $port, $tenant->slug);
+        }
+
+        return sprintf('%s://%s.%s%s', $scheme, $tenant->slug, $host, $port);
     }
 }

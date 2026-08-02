@@ -40,6 +40,7 @@ use Webkul\Sitemap\Providers\SitemapServiceProvider;
 use Webkul\SocialLogin\Providers\SocialLoginServiceProvider;
 use Webkul\SocialShare\Providers\SocialShareServiceProvider;
 use Webkul\Stripe\Providers\StripeServiceProvider;
+use Webkul\SuperAdmin\Providers\SuperAdminServiceProvider;
 use Webkul\Tax\Providers\TaxServiceProvider;
 use Webkul\Tenant\Providers\TenantServiceProvider;
 use Webkul\Theme\Providers\ThemeServiceProvider;
@@ -92,4 +93,5 @@ return [
     ThemeManagerServiceProvider::class,
     BusinessPresetServiceProvider::class,
     TenantServiceProvider::class,
+    SuperAdminServiceProvider::class,
 ];

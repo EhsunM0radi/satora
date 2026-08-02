@@ -7,7 +7,10 @@ use Webkul\Tenant\Contracts\Tenant;
 use Webkul\Tenant\Repositories\TenantRepository;
 
 /**
- * Resolves the current tenant from the request (domain or subdomain).
+ * Resolves the current tenant from the request.
+ *
+ * In production: domain or subdomain (e.g. mystore.satora.com).
+ * In local: path-based (satora.test/shop/mystore) or subdomain (mystore.satora.test).
  */
 class TenantResolver
 {
@@ -18,7 +21,7 @@ class TenantResolver
     ) {}
 
     /**
-     * Resolve tenant from the request host.
+     * Resolve tenant from the request.
      */
     public function resolve(Request $request): ?Tenant
     {
@@ -40,6 +43,17 @@ class TenantResolver
             if (count($parts) >= 3) {
                 $slug = $parts[0];
                 $tenant = $this->repository->findBySlug($slug);
+                if ($tenant && $tenant->isActive()) {
+                    return $this->current = $tenant;
+                }
+            }
+        }
+
+        // Local fallback: path-based — satora.test/shop/{slug}
+        if (app()->environment('local')) {
+            $path = trim($request->path(), '/');
+            if (preg_match('#^shop/([a-z0-9_-]+)(/.*)?$#', $path, $matches)) {
+                $tenant = $this->repository->findBySlug($matches[1]);
                 if ($tenant && $tenant->isActive()) {
                     return $this->current = $tenant;
                 }

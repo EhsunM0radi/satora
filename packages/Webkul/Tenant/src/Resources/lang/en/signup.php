@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'title' => 'Start Free — Satora',
+    'heading' => '🚀 Create Your Account',
+    'subtitle' => 'Build your professional store in minutes',
+    'name' => '👤 Your Name',
+    'name_placeholder' => 'e.g. John Doe',
+    'email' => '📧 Email',
+    'password' => '🔐 Password',
+    'password_placeholder' => 'At least 8 characters',
+    'phone' => '📱 Phone Number',
+    'submit' => '🎉 Create Account — Start Free',
+    'or' => 'or',
+    'otp_button' => '📱 Sign in with OTP',
+    'terms' => 'By signing up, you agree to our Terms of Service and Privacy Policy.',
+    'has_account' => 'Already have an account? <a href=":url">Sign in</a>',
+    'creating' => 'Creating your account...',
+    'otp_title' => '📱 Verify Code',
+    'otp_subtitle' => 'Enter the 6-digit code sent to your phone',
+    'otp_code' => 'Verification Code',
+    'otp_verify' => 'Verify & Create Account',
+    'invalid_otp' => 'The code you entered is incorrect.',
+    'back' => '← Back',
+];
