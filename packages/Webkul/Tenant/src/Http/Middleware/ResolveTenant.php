@@ -4,6 +4,7 @@ namespace Webkul\Tenant\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Webkul\Tenant\Repositories\TenantRepository;
 use Webkul\Tenant\TenantResolver;
 
 class ResolveTenant
@@ -14,10 +15,15 @@ class ResolveTenant
         $tenant = $resolver->resolve($request);
 
         if (! $tenant) {
-            // No tenant resolved from domain/path — try admin's tenant for locale
-            $this->applyAdminTenantLocale();
+            // No tenant resolved from domain/path — try session fallback (path-based admin redirect)
+            $tenant = $this->resolveFromSession($resolver);
 
-            return $next($request);
+            if (! $tenant) {
+                // Still nothing — try admin's tenant for locale
+                $this->applyAdminTenantLocale();
+
+                return $next($request);
+            }
         }
 
         // Set the tenant in the app container
@@ -29,6 +35,28 @@ class ResolveTenant
         }
 
         return $next($request);
+    }
+
+    /**
+     * Resolve tenant from session-stored ID (used after shop/{slug}/admin redirect).
+     */
+    protected function resolveFromSession(TenantResolver $resolver)
+    {
+        $id = session('impersonated_tenant_id');
+
+        if (! $id) {
+            return null;
+        }
+
+        $tenant = app(TenantRepository::class)->find($id);
+
+        if ($tenant && $tenant->isActive()) {
+            $resolver->setCurrent($tenant);
+
+            return $tenant;
+        }
+
+        return null;
     }
 
     /**

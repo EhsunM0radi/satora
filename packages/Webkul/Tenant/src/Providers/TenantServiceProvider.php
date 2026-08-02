@@ -78,15 +78,27 @@ class TenantServiceProvider extends ServiceProvider
                     ->name('impersonate');
             });
 
-            // Local: path-based tenant storefront — satora.test/shop/{slug}
+            // Local: path-based tenant storefront — localhost/shop/{slug}
             if (app()->environment('local')) {
                 Route::group(['prefix' => 'shop/{tenantSlug}'], function () {
+                    // Storefront
                     Route::get('/', [HomeController::class, 'index'])
                         ->name('shop.tenant.home');
                     Route::get('contact-us', [HomeController::class, 'contactUs'])
                         ->name('shop.tenant.contact_us');
                     Route::get('search', [SearchController::class, 'index'])
                         ->name('shop.tenant.search');
+
+                    // Admin — store tenant in session then redirect to central admin
+                    Route::any('admin/{any?}', function (string $tenantSlug) {
+                        $resolver = app(TenantResolver::class);
+                        session()->put('impersonated_tenant_id', $resolver->id());
+
+                        // Strip "shop/{slug}" prefix, redirect to /admin/...
+                        $target = preg_replace('#^shop/'.preg_quote($tenantSlug, '#').'#', '', request()->path());
+
+                        return redirect('/'.ltrim($target, '/'));
+                    })->where('any', '.*')->name('shop.tenant.admin');
                 });
             }
         });
