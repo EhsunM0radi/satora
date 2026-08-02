@@ -144,6 +144,7 @@ class SignupController extends Controller
                 'name' => __('tenant::onboarding.wizard.my_store_default', ['name' => $request->input('name')]),
                 'slug' => $slug,
                 'locale' => 'fa',
+                'mobile' => $phone,
             ]);
 
             $tenant->users()->attach($admin->id, ['role' => 'tenant_admin']);
