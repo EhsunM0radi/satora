@@ -1,0 +1,10 @@
+<?php
+
+namespace Webkul\POS\Http\Controllers\Api;
+
+use Webkul\Admin\Http\Controllers\Controller;
+
+class PosExchangeController extends Controller
+{
+    // POS API Endpoint — terminal-facing JSON responses
+}

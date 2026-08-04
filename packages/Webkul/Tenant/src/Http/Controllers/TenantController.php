@@ -56,7 +56,6 @@ class TenantController extends Controller
                         'password' => Hash::make($request->admin_password ?? 'password'),
                         'status' => 1,
                         'role_id' => 1,
-                        'view_permission' => 'global',
                     ]
                 );
 

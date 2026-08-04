@@ -7,12 +7,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Webkul\Shop\Http\Controllers\HomeController;
 use Webkul\Shop\Http\Controllers\SearchController;
+use Webkul\Tenant\Contracts\SmsDriver;
 use Webkul\Tenant\Http\Controllers\OnboardingController;
 use Webkul\Tenant\Http\Controllers\SignupController;
-use Webkul\Tenant\Http\Controllers\SuperAdminController;
 use Webkul\Tenant\Http\Controllers\TenantController;
 use Webkul\Tenant\Http\Middleware\ResolveTenant;
 use Webkul\Tenant\Repositories\TenantRepository;
+use Webkul\Tenant\Services\OtpService;
+use Webkul\Tenant\Services\SmsDrivers\LogDriver;
 use Webkul\Tenant\TenantResolver;
 
 class TenantServiceProvider extends ServiceProvider
@@ -25,6 +27,14 @@ class TenantServiceProvider extends ServiceProvider
 
         $this->app->singleton(TenantResolver::class, function ($app) {
             return new TenantResolver($app->make(TenantRepository::class));
+        });
+
+        // SMS driver — swap binding for production provider
+        $this->app->bind(SmsDriver::class, LogDriver::class);
+
+        // OTP service
+        $this->app->singleton(OtpService::class, function ($app) {
+            return new OtpService($app->make(SmsDriver::class));
         });
     }
 
@@ -40,7 +50,7 @@ class TenantServiceProvider extends ServiceProvider
 
     protected function registerRoutes(): void
     {
-        Route::group(['prefix' => 'api/v1', 'middleware' => 'api'], function () {
+        Route::group(['prefix' => 'api/v1', 'middleware' => ['api', 'auth:admin']], function () {
             Route::post('tenant', [TenantController::class, 'store'])
                 ->name('api.tenant.store');
         });
@@ -49,33 +59,24 @@ class TenantServiceProvider extends ServiceProvider
             Route::get('signup', [SignupController::class, 'show'])
                 ->name('signup.show');
             Route::post('signup', [SignupController::class, 'store'])
-                ->name('signup.store');
+                ->name('signup.store')
+                ->middleware('throttle:10,1');
 
-            // OTP signup flow
+            // OTP signup flow — rate-limited to prevent brute-force
             Route::post('signup/otp/send', [SignupController::class, 'sendOtp'])
-                ->name('signup.otp.send');
+                ->name('signup.otp.send')
+                ->middleware('throttle:3,1');
             Route::get('signup/otp/verify', [SignupController::class, 'showOtpVerify'])
                 ->name('signup.otp.verify');
             Route::post('signup/otp/verify', [SignupController::class, 'verifyOtp'])
-                ->name('signup.otp.verify.submit');
+                ->name('signup.otp.verify.submit')
+                ->middleware('throttle:5,2');
 
             Route::middleware('admin')->group(function () {
                 Route::get('onboarding/{step?}', [OnboardingController::class, 'show'])
                     ->name('onboarding.show');
                 Route::post('onboarding', [OnboardingController::class, 'store'])
                     ->name('onboarding.store');
-            });
-
-            // Super Admin panel
-            Route::prefix('super-admin')->middleware('admin')->name('super_admin.')->group(function () {
-                Route::get('/', [SuperAdminController::class, 'index'])
-                    ->name('dashboard');
-                Route::get('create', [SuperAdminController::class, 'create'])
-                    ->name('create');
-                Route::post('create', [SuperAdminController::class, 'store'])
-                    ->name('store');
-                Route::get('impersonate/{tenantId}', [SuperAdminController::class, 'impersonate'])
-                    ->name('impersonate');
             });
 
             // Local: path-based tenant storefront — localhost/shop/{slug}

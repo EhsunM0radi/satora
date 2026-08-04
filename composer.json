@@ -48,33 +48,32 @@
         "spatie/laravel-responsecache": "^7.4",
         "spatie/laravel-sitemap": "^7.3",
         "stevebauman/purify": "^6.3",
-        "stripe/stripe-php": "^17.3"
+        "stripe/stripe-php": "^16.0"
     },
     "require-dev": {
-        "bagisto/laravel-datafaker": "2.3.*",
-        "barryvdh/laravel-debugbar": "^3.8",
-        "fakerphp/faker": "^1.23",
-        "laravel/boost": "^2.4",
-        "laravel/pint": "^1.19",
-        "mockery/mockery": "^1.6",
+        "fakerphp/faker": "^1.19",
+        "itsgoingd/clockwork": "^5.2",
+        "laravel/dusk": "^8.0",
+        "laravel/pint": "^1.0",
+        "laravel/sail": "^1.0",
+        "mockery/mockery": "^1.4",
         "nunomaduro/collision": "^8.0",
-        "pestphp/pest": "^3.0",
+        "pestphp/pest": "^3.4",
         "pestphp/pest-plugin-laravel": "^3.0",
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^11.0",
+        "spatie/laravel-ray": "^1.30"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/",
+            "App\\\\": "app/",
             "Webkul\\Admin\\": "packages/Webkul/Admin/src",
             "Webkul\\Attribute\\": "packages/Webkul/Attribute/src",
             "Webkul\\BookingProduct\\": "packages/Webkul/BookingProduct/src",
-            "Webkul\\CMS\\": "packages/Webkul/CMS/src",
             "Webkul\\CartRule\\": "packages/Webkul/CartRule/src",
             "Webkul\\CatalogRule\\": "packages/Webkul/CatalogRule/src",
             "Webkul\\Category\\": "packages/Webkul/Category/src",
             "Webkul\\Checkout\\": "packages/Webkul/Checkout/src",
+            "Webkul\\CMS\\": "packages/Webkul/CMS/src",
             "Webkul\\Core\\": "packages/Webkul/Core/src",
             "Webkul\\Customer\\": "packages/Webkul/Customer/src",
             "Webkul\\DataGrid\\": "packages/Webkul/DataGrid/src",
@@ -89,13 +88,13 @@
             "Webkul\\MagicAI\\": "packages/Webkul/MagicAI/src",
             "Webkul\\Marketing\\": "packages/Webkul/Marketing/src",
             "Webkul\\Notification\\": "packages/Webkul/Notification/src",
-            "Webkul\\PayU\\": "packages/Webkul/PayU/src",
             "Webkul\\Payment\\": "packages/Webkul/Payment/src",
             "Webkul\\Paypal\\": "packages/Webkul/Paypal/src",
+            "Webkul\\PayU\\": "packages/Webkul/PayU/src",
             "Webkul\\PhonePe\\": "packages/Webkul/PhonePe/src",
             "Webkul\\Product\\": "packages/Webkul/Product/src",
-            "Webkul\\RMA\\": "packages/Webkul/RMA/src",
             "Webkul\\Razorpay\\": "packages/Webkul/Razorpay/src",
+            "Webkul\\RMA\\": "packages/Webkul/RMA/src",
             "Webkul\\Rule\\": "packages/Webkul/Rule/src",
             "Webkul\\Sales\\": "packages/Webkul/Sales/src",
             "Webkul\\Shipping\\": "packages/Webkul/Shipping/src",
@@ -109,25 +108,30 @@
             "Webkul\\User\\": "packages/Webkul/User/src",
             "Webkul\\ThemeManager\\": "packages/Webkul/ThemeManager/src",
             "Webkul\\Tenant\\": "packages/Webkul/Tenant/src",
-            "Webkul\\BusinessPreset\\": "packages/Webkul/BusinessPreset/src"
+            "Webkul\\BusinessPreset\\": "packages/Webkul/BusinessPreset/src",
+            "Webkul\\SuperAdmin\\": "packages/Webkul/SuperAdmin/src",
+            "Webkul\\POS\\": "packages/Webkul/POS/src"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/",
             "Webkul\\Admin\\Tests\\": "packages/Webkul/Admin/tests",
+            "Webkul\\BusinessPreset\\Tests\\": "packages/Webkul/BusinessPreset/tests",
             "Webkul\\Core\\Tests\\": "packages/Webkul/Core/tests",
             "Webkul\\Customer\\Tests\\": "packages/Webkul/Customer/tests",
             "Webkul\\DataGrid\\Tests\\": "packages/Webkul/DataGrid/tests",
             "Webkul\\EUWithdrawal\\Tests\\": "packages/Webkul/EUWithdrawal/tests",
             "Webkul\\Installer\\Tests\\": "packages/Webkul/Installer/tests",
-            "Webkul\\Payment\\Tests\\": "packages/Webkul/Payment/tests",
             "Webkul\\PayU\\Tests\\": "packages/Webkul/PayU/tests",
+            "Webkul\\Payment\\Tests\\": "packages/Webkul/Payment/tests",
             "Webkul\\Razorpay\\Tests\\": "packages/Webkul/Razorpay/tests",
             "Webkul\\Shop\\Tests\\": "packages/Webkul/Shop/tests",
             "Webkul\\Stripe\\Tests\\": "packages/Webkul/Stripe/tests",
+            "Webkul\\SuperAdmin\\Tests\\": "packages/Webkul/SuperAdmin/tests",
+            "Webkul\\Tenant\\Tests\\": "packages/Webkul/Tenant/tests",
             "Webkul\\ThemeManager\\Tests\\": "packages/Webkul/ThemeManager/tests",
-            "Webkul\\BusinessPreset\\Tests\\": "packages/Webkul/BusinessPreset/tests"
+            "Webkul\\POS\\Tests\\": "packages/Webkul/POS/tests"
         }
     },
     "scripts": {
@@ -148,13 +152,15 @@
             ]
         }
     },
-    "repositories": [{
-        "type": "path",
-        "url": "packages/*/*",
-        "options": {
-            "symlink": true
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/*/*",
+            "options": {
+                "symlink": true
+            }
         }
-    }],
+    ],
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",

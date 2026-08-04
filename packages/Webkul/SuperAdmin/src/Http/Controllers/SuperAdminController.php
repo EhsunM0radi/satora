@@ -8,7 +8,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Webkul\Tenant\Repositories\TenantRepository;
-use Webkul\User\Models\Admin;
 
 class SuperAdminController extends Controller
 {
@@ -29,17 +28,30 @@ class SuperAdminController extends Controller
     }
 
     /**
-     * Impersonate a tenant admin — login as their first admin and redirect.
+     * Impersonate a tenant admin — login as their tenant_admin and redirect.
+     *
+     * Requires: the authenticated admin must have role_id = 1 (Administrator).
      */
     public function impersonate(int $tenantId): RedirectResponse
     {
+        $admin = Auth::guard('admin')->user();
+
+        // Only super admins (role_id = 1) can impersonate
+        if (! $admin || (int) $admin->role_id !== 1) {
+            abort(403, 'دسترسی غیرمجاز.');
+        }
+
         $tenant = $this->tenantRepository->find($tenantId);
         if (! $tenant) {
             return back()->withErrors(['error' => 'تننت یافت نشد.']);
         }
 
-        $admin = $tenant->users()->first();
-        if (! $admin) {
+        // Get the tenant_admin user for this tenant (role = 'tenant_admin' in pivot)
+        $tenantAdmin = $tenant->users()
+            ->wherePivot('role', 'tenant_admin')
+            ->first();
+
+        if (! $tenantAdmin) {
             return back()->withErrors(['error' => 'این تننت ادمین ندارد.']);
         }
 
@@ -47,7 +59,7 @@ class SuperAdminController extends Controller
         Auth::guard('admin')->logout();
 
         // Login as tenant admin
-        Auth::guard('admin')->login($admin);
+        Auth::guard('admin')->login($tenantAdmin);
 
         // Set tenant context
         app()->instance('current_tenant', $tenant);

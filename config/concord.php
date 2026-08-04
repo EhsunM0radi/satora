@@ -42,5 +42,6 @@ return [
         Webkul\ThemeManager\Providers\ModuleServiceProvider::class,
         Webkul\BusinessPreset\Providers\ModuleServiceProvider::class,
         Webkul\Tenant\Providers\ModuleServiceProvider::class,
+        Webkul\POS\Providers\ModuleServiceProvider::class,
     ],
 ];

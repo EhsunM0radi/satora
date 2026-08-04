@@ -92,18 +92,18 @@ class OnboardingController extends Controller
                 break;
 
             case 'business-info':
-                $tenant->update($request->only(['store_name', 'slug', 'mobile', 'address']));
                 // Map store_name to tenant name
+                $updateData = $request->only(['slug', 'mobile', 'address']);
                 if ($request->filled('store_name')) {
-                    $tenant->name = $request->input('store_name');
-                    $tenant->save();
+                    $updateData['name'] = $request->input('store_name');
                 }
-                // Update admin user name to match store name
+                $tenant->update($updateData);
+
+                // Update admin user name to match store name if admin was auto-named
                 if ($request->filled('store_name')) {
                     $admin = Auth::guard('admin')->user();
-                    if ($admin && $admin->name === $tenant->getOriginal('name')) {
-                        $admin->name = $request->input('store_name');
-                        $admin->save();
+                    if ($admin) {
+                        $admin->update(['name' => $request->input('store_name')]);
                     }
                 }
                 break;

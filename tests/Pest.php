@@ -1,6 +1,5 @@
 <?php
 
-use Webkul\ThemeManager\Tests\ThemeManagerTestCase;
 use Webkul\Admin\Tests\AdminTestCase;
 use Webkul\BusinessPreset\Tests\BusinessPresetTestCase;
 use Webkul\Core\Tests\CoreTestCase;
@@ -13,6 +12,9 @@ use Webkul\PayU\Tests\PayUTestCase;
 use Webkul\Razorpay\Tests\RazorpayTestCase;
 use Webkul\Shop\Tests\ShopTestCase;
 use Webkul\Stripe\Tests\StripeTestCase;
+use Webkul\Tenant\Tests\TenantTestCase;
+use Webkul\ThemeManager\Tests\ThemeManagerTestCase;
+use Webkul\POS\Tests\POSTestCase;
 
 ini_set('memory_limit', '1024M');
 
@@ -27,7 +29,6 @@ ini_set('memory_limit', '1024M');
 |
 */
 
-uses(ThemeManagerTestCase::class)->in('../packages/Webkul/ThemeManager/tests');
 uses(AdminTestCase::class)->in('../packages/Webkul/Admin/tests');
 uses(BusinessPresetTestCase::class)->in('../packages/Webkul/BusinessPreset/tests');
 uses(CoreTestCase::class)->in('../packages/Webkul/Core/tests');
@@ -40,6 +41,9 @@ uses(PayUTestCase::class)->in('../packages/Webkul/PayU/tests');
 uses(RazorpayTestCase::class)->in('../packages/Webkul/Razorpay/tests');
 uses(ShopTestCase::class)->in('../packages/Webkul/Shop/tests');
 uses(StripeTestCase::class)->in('../packages/Webkul/Stripe/tests');
+uses(TenantTestCase::class)->in('../packages/Webkul/Tenant/tests');
+uses(ThemeManagerTestCase::class)->in('../packages/Webkul/ThemeManager/tests');
+uses(POSTestCase::class)->in('../packages/Webkul/POS/tests');
 
 /*
 |--------------------------------------------------------------------------

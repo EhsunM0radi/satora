@@ -2,6 +2,7 @@
 
 namespace Webkul\Tenant\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -10,12 +11,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Webkul\Tenant\Repositories\TenantRepository;
+use Webkul\Tenant\Services\OtpService;
 use Webkul\User\Models\Admin;
 
 class SignupController extends Controller
 {
     public function __construct(
-        protected TenantRepository $tenantRepository
+        protected TenantRepository $tenantRepository,
+        protected OtpService $otpService
     ) {}
 
     public function show(): View
@@ -25,9 +28,12 @@ class SignupController extends Controller
 
     /**
      * Email + Password signup.
-     * Creates user + placeholder tenant, then redirects to onboarding wizard.
+     *
+     * Creates an admin user with a temporary tenant placeholder.
+     * Business details (store name, slug, niche, theme) are completed
+     * in the onboarding wizard that follows.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -38,7 +44,6 @@ class SignupController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create admin user
             $admin = Admin::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -47,10 +52,8 @@ class SignupController extends Controller
                 'role_id' => 1,
             ]);
 
-            // Auto-generate a unique slug from email (user can change in wizard)
             $slug = $this->generateUniqueSlug($validated['email']);
 
-            // Create placeholder tenant — business details filled in wizard
             $tenant = $this->tenantRepository->create([
                 'name' => __('tenant::onboarding.wizard.my_store_default', ['name' => $validated['name']]),
                 'slug' => $slug,
@@ -61,7 +64,6 @@ class SignupController extends Controller
 
             DB::commit();
 
-            // Auto-login the new admin
             Auth::guard('admin')->login($admin);
 
             session()->put('locale', 'fa');
@@ -78,25 +80,38 @@ class SignupController extends Controller
     }
 
     /**
-     * OTP request — send verification code via SMS.
+     * Request an OTP verification code via SMS.
+     *
+     * Generates a random 6-digit code, persists it with a 5-minute expiry,
+     * and sends it via the configured SMS driver.
      */
-    public function sendOtp(Request $request)
+    public function sendOtp(Request $request): RedirectResponse
     {
         $request->validate([
             'phone' => 'required|string|max:20',
         ]);
 
-        // TODO: Implement OTP sending via SMS provider
-        // For now, redirect to OTP verification page with phone in session
-        session()->put('signup_phone', $request->input('phone'));
+        $phone = $request->input('phone');
 
-        return redirect()->route('signup.otp.verify');
+        // Rate-limit: max 5 OTP requests per phone in 15 minutes
+        if ($this->otpService->recentAttempts($phone) >= 5) {
+            return back()->withErrors([
+                'phone' => __('tenant::signup.too_many_otp_requests'),
+            ]);
+        }
+
+        $this->otpService->send($phone, 'signup');
+
+        session()->put('signup_phone', $phone);
+
+        return redirect()->route('signup.otp.verify')
+            ->with('status', __('tenant::signup.otp_sent'));
     }
 
     /**
      * OTP verification page.
      */
-    public function showOtpVerify(): View
+    public function showOtpVerify(): RedirectResponse|View
     {
         if (! session()->has('signup_phone')) {
             return redirect()->route('signup.show');
@@ -108,9 +123,12 @@ class SignupController extends Controller
     }
 
     /**
-     * Verify OTP and create account.
+     * Verify the OTP code and create the account.
+     *
+     * Uses an atomic update to prevent replay — each code can
+     * only be used once.
      */
-    public function verifyOtp(Request $request)
+    public function verifyOtp(Request $request): RedirectResponse
     {
         $request->validate([
             'otp' => 'required|string|size:6',
@@ -122,8 +140,10 @@ class SignupController extends Controller
             return redirect()->route('signup.show');
         }
 
-        // Test OTP: always accept 111111; real SMS verification TBD
-        if ($request->input('otp') !== '111111') {
+        $code = $request->input('otp');
+
+        // Verify the code atomically
+        if (! $this->otpService->verify($phone, $code, 'signup')) {
             return back()->withErrors(['otp' => __('tenant::signup.invalid_otp')]);
         }
 
@@ -169,11 +189,9 @@ class SignupController extends Controller
 
     /**
      * Generate a unique slug from an email or phone string.
-     * For emails, uses the local part. For phone numbers, generates a random slug.
      */
     protected function generateUniqueSlug(string $input): string
     {
-        // Extract the local part of email, or fall back to random for phone numbers
         $local = strstr($input, '@', true);
         $base = $local
             ? Str::slug(preg_replace('/[^a-zA-Z0-9]/', '', $local) ?: 'store')

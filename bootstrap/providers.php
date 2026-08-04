@@ -45,6 +45,7 @@ use Webkul\Tax\Providers\TaxServiceProvider;
 use Webkul\Tenant\Providers\TenantServiceProvider;
 use Webkul\Theme\Providers\ThemeServiceProvider;
 use Webkul\ThemeManager\Providers\ThemeManagerServiceProvider;
+use Webkul\POS\Providers\POSServiceProvider;
 use Webkul\User\Providers\UserServiceProvider;
 
 return [
@@ -94,4 +95,5 @@ return [
     BusinessPresetServiceProvider::class,
     TenantServiceProvider::class,
     SuperAdminServiceProvider::class,
+    POSServiceProvider::class,
 ];

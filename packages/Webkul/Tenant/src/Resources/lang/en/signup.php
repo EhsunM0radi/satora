@@ -20,6 +20,8 @@ return [
     'otp_subtitle' => 'Enter the 6-digit code sent to your phone',
     'otp_code' => 'Verification Code',
     'otp_verify' => 'Verify & Create Account',
-    'invalid_otp' => 'The code you entered is incorrect.',
+    'invalid_otp' => 'The code you entered is incorrect or has expired.',
+    'otp_sent' => 'A verification code has been sent to your phone.',
+    'too_many_otp_requests' => 'Too many code requests. Please wait a few minutes.',
     'back' => '← Back',
 ];

@@ -62,22 +62,22 @@ class Tenant extends Model implements TenantContract
 
     public function getTheme(): string
     {
-        return $this->theme;
+        return $this->theme ?? 'minimal-luxury';
     }
 
     public function getTemplate(): string
     {
-        return $this->template;
+        return $this->template ?? 'general';
     }
 
     public function getLocale(): string
     {
-        return $this->locale;
+        return $this->locale ?? config('app.locale', 'en');
     }
 
     public function isActive(): bool
     {
-        return $this->is_active;
+        return (bool) $this->is_active;
     }
 
     public function users()

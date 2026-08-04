@@ -67,6 +67,14 @@
         <testsuite name="Stripe Feature Test">
             <directory suffix="Test.php">packages/Webkul/Stripe/tests/Feature</directory>
         </testsuite>
+        <!-- POS package testsuites. -->
+        <testsuite name="POS Unit Test">
+            <directory suffix="Test.php">packages/Webkul/POS/tests/Unit</directory>
+        </testsuite>
+        <testsuite name="POS Feature Test">
+            <directory suffix="Test.php">packages/Webkul/POS/tests/Feature</directory>
+        </testsuite>
+
         <!-- ThemeManager package testsuites. -->
         <testsuite name="ThemeManager Unit Test">
             <directory suffix="Test.php">packages/Webkul/ThemeManager/tests/Unit</directory>
@@ -84,6 +92,15 @@
         <testsuite name="BusinessPreset Feature Test">
             <directory suffix="Test.php">packages/Webkul/BusinessPreset/tests/Feature</directory>
         </testsuite>
+
+        <!-- Tenant package testsuites. -->
+        <testsuite name="Tenant Unit Test">
+            <directory suffix="Test.php">packages/Webkul/Tenant/tests/Unit</directory>
+        </testsuite>
+
+        <testsuite name="Tenant Feature Test">
+            <directory suffix="Test.php">packages/Webkul/Tenant/tests/Feature</directory>
+        </testsuite>
     </testsuites>
 
     <source>
@@ -96,6 +113,7 @@
 
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_LOCALE" value="en"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>
